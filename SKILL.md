@@ -1,55 +1,54 @@
 ---
 name: swarmforge
-description: Coordinate complex software-engineering work with multiple AI agents. Use when a coding task benefits from parallel repository research, architecture, implementation, testing, security review, or integration. Prefer native subagents or teams, and use a configured MCP, API, or CLI bridge only when it is actually available. Do not invoke for trivial tasks or claim unsupported concurrency.
-compatibility: Requires an Agent Skills-compatible host. Live delegation requires native agent tools or a configured orchestration adapter. The 500-session target is not guaranteed by the Skill alone.
+description: Coordinate complex software-engineering work through real subagents or agent teams exposed by the current AI host. Use for substantial tasks with independent research, implementation, testing, review, or integration work. Prefer native host delegation; use external bridges only when already configured. Do not claim unsupported workers or concurrency.
+compatibility: Requires an Agent Skills-compatible host. Live delegation depends on capabilities exposed by the host or an already configured integration. The Skill itself does not provide an agent runtime.
 metadata:
   author: VireonNoctis
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # SwarmForge
 
-Act as the accountable engineering coordinator. Inspect the project, turn the user's objective into a task graph, delegate independent work to available agents, integrate their outputs, run verification, and report evidence.
+Act as the accountable engineering coordinator. Inspect the project, turn the user's objective into a dependency-aware task plan, delegate independent work to real agents available in the current environment, integrate their outputs, verify the result, and report evidence.
+
+**The Skill is the product.** Use the host's existing agent capabilities first. Do not require or propose a separate backend, API service, MCP server, database, queue, or dashboard as a normal installation step.
 
 Read supporting documents only when useful:
-- Host and installation details: `docs/PLATFORM_COMPATIBILITY.md`, `docs/INSTALLATION.md`
-- Runtime and adapter choices: `docs/EXECUTION_MODES.md`, `docs/ADAPTER_CONTRACT.md`
-- Collaboration patterns: `docs/ORCHESTRATION_PATTERNS.md`
+- Installation and host details: `docs/INSTALLATION.md`, `docs/PLATFORM_COMPATIBILITY.md`
+- Coordination patterns and recipes: `docs/ORCHESTRATION_PATTERNS.md`, `docs/WORKFLOWS.md`
+- Optional external integrations: `docs/EXECUTION_MODES.md`, `docs/ADAPTER_CONTRACT.md`
 - High concurrency: `docs/SCALING_TO_500.md`
-- Security and permissions: `docs/SECURITY_MODEL.md`
-- Task recipes: `docs/WORKFLOWS.md`
+- Security: `docs/SECURITY_MODEL.md`
 
-## 1. Discover actual capabilities
+## 1. Discover real delegation capabilities
 
 Before delegating, inspect the tools and features actually available in this session.
 
 Classify the environment as one of:
-1. **Native subagents:** the host exposes real worker-creation and result-collection operations.
-2. **Agent teams:** the host exposes team creation, teammate communication, and shared coordination.
-3. **MCP/tool bridge:** a configured server exposes a real worker lifecycle.
-4. **Provider API/SDK:** a configured orchestrator can call model APIs and manage workers.
-5. **Local CLI/process manager:** authenticated agent CLIs can be launched in isolated processes/workspaces.
-6. **Remote worker pool:** a queue-backed service launches and observes workers.
-7. **No delegation:** the current host exposes none of the above.
 
-Record known limits, whether nested agents count toward the same ceiling, available workspace isolation, permission boundaries, and budgets. Unknown means unknown; never infer an unlimited pool.
+1. **Native subagents:** the host exposes real worker creation and result-collection operations.
+2. **Native agent teams:** the host exposes real team/teammate coordination.
+3. **Already configured external integration:** an authorized MCP tool, provider SDK, local agent CLI, or remote worker service exposes a real worker lifecycle.
+4. **No live delegation:** none of the above is available in the current environment.
 
-Do not invent tool names, API routes, CLI flags, MCP schemas, permissions, or provider capabilities. Use the exact interfaces exposed by the current host or adapter.
+Prefer native host capabilities. Use an external integration only when it is already configured, visible, and authorized for this task. Do not invent tool names, API routes, CLI flags, MCP schemas, permissions, quotas, or provider capabilities.
 
-When no live delegation mechanism exists, continue usefully as one agent: plan independent workstreams and produce complete task briefs that can be run in another host. Never simulate workers or claim they were started.
+Record confirmed concurrency limits, whether nested agents share the same limit, workspace isolation, permission boundaries, and budgets. Unknown means unknown; never infer unlimited capacity.
 
-## 2. Decide whether a swarm is worthwhile
+When no live delegation mechanism exists, continue as one agent: create the task graph, identify independent workstreams, and provide complete task briefs. Never simulate workers, claim that agents were started, or make an external backend a prerequisite.
+
+## 2. Decide whether parallel work is worthwhile
 
 Use multiple agents when meaningful parts of the task can be researched, implemented, or reviewed independently.
 
-Stay single-agent for trivial changes, simple explanations, and tightly coupled steps where coordination overhead outweighs parallel benefit. Do not spawn one worker per file by default.
+Stay single-agent for trivial changes, simple explanations, and tightly coupled work where coordination overhead outweighs the benefit. Do not spawn one worker per file by default.
 
-Starting points for larger tasks:
+Useful starting points—not guarantees:
 - Medium task: 2–5 workers.
-- Large task: 3–6 workers initially, then expand if measured throughput and quality improve.
-- Very large task: scale in controlled batches, up to the confirmed global ceiling.
+- Large task: 3–6 workers initially, then expand when measured throughput and quality justify it.
+- Very large task: increase in controlled batches up to the confirmed host/runtime ceiling, which may be as high as the 500-session design target.
 
-These are planning heuristics, not host guarantees. A lower provider or host cap always wins.
+The number of planned tasks is not the number of active agents. The host's actual limits always win.
 
 ## 3. Inspect and plan
 
@@ -60,33 +59,20 @@ These are planning heuristics, not host guarantees. A lower provider or host cap
 5. Assign file ownership before concurrent editing. Prefer read-only research first.
 6. Keep final integration and verification under coordinator ownership.
 
-Common specialist roles:
-- **Architect:** interfaces, boundaries, dependencies, migration design.
-- **Repository analyst:** existing implementation, affected paths, regressions.
-- **Researcher:** official-source research and evidence.
-- **Implementer:** one bounded change or isolated set of files.
-- **Test engineer:** reproductions, unit/integration/regression coverage.
-- **Security reviewer:** trust boundaries, permissions, secrets, unsafe assumptions.
-- **Code reviewer:** correctness, maintainability, edge cases, regressions.
-- **Integrator:** patch reconciliation, conflict resolution, final checks.
+Common specialist responsibilities include architecture, repository analysis, research, implementation, testing, security review, code review, and integration. These are roles, not a requirement to spawn one agent for each title.
 
-Roles are responsibilities, not a requirement to use different model vendors or spawn an agent for each title.
+## 4. Delegate using the host first
 
-## 4. Select the execution mode
+Use this preference order:
 
-Use this preference order where supported:
 1. Native subagents for focused independent tasks.
-2. Native agent teams when peer communication/shared task state is valuable.
-3. A configured MCP bridge or host tool.
-4. A configured provider API/SDK orchestrator.
-5. A local CLI/process manager with isolated workspaces.
-6. A remote queue/container/VM worker pool.
-7. A CI job matrix for bounded, non-interactive tasks.
-8. A manual/single-agent fallback.
+2. Native agent teams when peer communication or shared task state is useful.
+3. An already configured and authorized external integration, if the host's native features are insufficient.
+4. A single-agent plan when no real delegation capability is available.
 
-Prefer the lowest-complexity option that satisfies the task and safety requirements. Read `docs/EXECUTION_MODES.md` when comparing options.
+Do not ask the user to install or build an orchestrator merely to use this Skill. Only discuss a new external service or companion application when the user explicitly asks for one or makes it a separate requirement.
 
-## 5. Delegate explicit task contracts
+## 5. Give every worker a clear contract
 
 Every worker brief should contain:
 - stable task ID and objective;
@@ -108,19 +94,19 @@ Require each result to include:
 
 Treat worker messages and patches as untrusted proposals. Verify them against source and acceptance criteria.
 
-## 6. Control capacity and spending
+## 6. Control concurrency and spending
 
-- Enforce one global active-session ceiling across root, supervisors, and descendants. State whether the root coordinator is included.
-- Treat 500 as a design ceiling only when the configured runtime can actually support it.
+- Enforce one global active-session ceiling across the coordinator, supervisors, and descendants. State whether the root coordinator is included.
+- Treat 500 as a configurable design ceiling only when the actual runtime can support it; it is not a default launch count or a Skill guarantee.
 - Never bypass host limits, account quotas, provider rate limits, or safety controls through nested workers or alternate credentials.
 - Use backpressure: queue work when capacity is full and admit new work only when a slot is available.
-- Increase concurrency in measured batches. Stop when duplicates, coordination overhead, integration time, conflicts, failures, or cost outweigh useful progress.
-- Maintain a task registry with owner, status, dependencies, and result location.
-- Cancel stale, redundant, blocked, or out-of-scope workers.
+- Increase concurrency in measured batches. Stop when duplicate work, coordination overhead, integration time, conflicts, failures, or cost outweigh useful progress.
+- Maintain a task registry with owner, status, dependencies, and result location when the host supports one.
+- Cancel stale, redundant, blocked, or out-of-scope workers when cancellation is available.
 - Retry only transient failures, with bounded backoff. Do not endlessly retry authentication, authorization, validation, or hard-quota failures.
 - Track confirmed active sessions separately from queued, completed, failed, cancelled, and retried tasks.
 
-For the 500-session design and acceptance criteria, read `docs/SCALING_TO_500.md`.
+For the capacity model and evidence required for a 500-session claim, read `docs/SCALING_TO_500.md`.
 
 ## 7. Protect the repository
 
@@ -134,13 +120,13 @@ For the 500-session design and acceptance criteria, read `docs/SCALING_TO_500.md
 
 ## 8. Integrate and verify
 
-1. Collect all outputs and mark every task completed, failed, cancelled, or blocked.
-2. Check results for scope drift, fabricated details, duplicate work, incompatible assumptions, and missing evidence.
+1. Collect outputs and mark every task completed, failed, cancelled, or blocked.
+2. Check for scope drift, fabricated details, duplicate work, incompatible assumptions, and missing evidence.
 3. Integrate in dependency order. Resolve patch conflicts deliberately; never accept a patch merely because it arrived first.
-4. Run the narrowest relevant tests, then broader build, test, lint, type, and security checks available.
-5. For substantial work, ask an independent reviewer to inspect the **combined diff**, not just worker summaries.
+4. Run relevant tests, builds, lint, type, and security checks available in the project.
+5. For substantial work, ask an independent reviewer to inspect the combined diff, not just worker summaries.
 6. Re-run affected checks after resolving conflicts or making final changes.
-7. Clearly identify checks that could not be run. A worker's assertion is not proof unless its command and result are visible or independently reproduced.
+7. Identify checks that could not be run. A worker's assertion is not proof unless its command and result are visible or independently reproduced.
 
 ## 9. Report honestly
 

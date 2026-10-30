@@ -2,91 +2,84 @@
 
 ## Product boundary
 
-SwarmForge is a portable Agent Skill. It provides instructions, task contracts, coordination policies, and operational guidance. It is not an agent runtime and does not create model sessions without host-provided tools or a separately deployed adapter.
+SwarmForge is a portable Agent Skill installed from this repository. The root `SKILL.md` contains the coordinator workflow; supporting Markdown files provide installation guidance, patterns, security practices, and optional integration contracts.
 
-The portable Skill is intentionally independent of one model vendor. Host adapters translate its generic workflow into the operations supported by a particular runtime.
+**There is no SwarmForge runtime service in this repository.** The Skill does not create model sessions, host workers, schedule provider requests, store task state, or expose a web UI. Those capabilities belong to the AI host or to an external integration that a user has separately configured.
 
-## Logical architecture
+## Runtime relationship
 
 ~~~mermaid
 flowchart TD
-    U[User objective] --> S[SwarmForge Skill]
-    S --> C[Capability discovery]
-    C --> P[Task planner and dependency graph]
-    P --> O[Orchestration strategy]
-    O --> H{Confirmed host capability}
-    H -->|Native| N[Native subagents or teams]
-    H -->|MCP| M[Connected orchestration tools]
-    H -->|API| A[Provider API or SDK]
-    H -->|Local| L[CLI and process workers]
-    H -->|Remote| R[Queue and worker pool]
-    H -->|Unavailable| F[Single-agent plan and task briefs]
-    N --> I[Result collection]
-    M --> I
-    A --> I
-    L --> I
-    R --> I
+    U[User request] --> S[SwarmForge Skill]
+    S --> D[Discover host capabilities]
+    D --> N{Real delegation available?}
+    N -->|Yes| H[Host-native subagents or teams]
+    N -->|Configured integration| X[Existing authorized bridge]
+    N -->|No| F[Single-agent plan and task briefs]
+    H --> I[Collect and inspect results]
+    X --> I
     F --> I
-    I --> V[Integration and verification]
-    V --> D[Auditable delivery]
+    I --> V[Integrate and verify]
+    V --> R[Evidence-based report]
 ~~~
 
-This is a logical design, not a claim that all adapters are implemented in this repository.
+The host is the runtime. Native subagents and agent teams are the preferred execution path. An already configured external integration may be used when needed. Otherwise, SwarmForge falls back to a single-agent plan.
 
-## Layers
+## What exists in this repository
 
-| Layer | Responsibility | Must not assume |
+| Component | Purpose | Runtime status |
 |---|---|---|
-| Skill | Plan, delegate policy, contracts, verify | A particular tool or runtime |
-| Host adapter | Map generic tasks to host operations | Other hosts have equivalent APIs |
-| Orchestrator | Queue, dependencies, lifecycle, quotas, retries | Unlimited provider capacity |
-| Workspace provider | Filesystem, worktree, container, patch exchange | Shared writes are safe |
-| Model provider | Inference, tool calls, model limits | All vendors behave identically |
-| Integration gate | Conflict resolution, tests, final report | Worker summaries prove correctness |
+| `SKILL.md` | Portable workflow, delegation policy, task contracts, verification | Used by the host |
+| `docs/` | Installation, patterns, security, scaling, and optional adapter guidance | Reference material |
+| `agents/openai.yaml` | Optional presentation metadata for supported OpenAI Skill surfaces | Metadata only |
+| `scripts/validate.py` | Checks package frontmatter, required docs, and local links | Maintainer tool |
+| `tests/` | Package smoke tests | Maintainer checks |
 
-## Worker lifecycle
+No compiled application, server, database, queue, orchestrator, provider integration, or dashboard is bundled.
 
-1. Discover capabilities and limits.
-2. Plan tasks and dependency edges.
-3. Admit tasks under global and provider budgets.
-4. Execute with the selected runtime.
-5. Observe status, logs, cancellation, and usage.
-6. Collect results and integrate them.
-7. Verify, close sessions, release workspaces, and report.
+## Responsibility boundaries
 
-## Task state model
+| Responsibility | Owner |
+|---|---|
+| Read and apply the Skill instructions | Compatible AI host |
+| Create native subagents or teammates | Host's exposed agent tools |
+| Enforce account, model, and provider quotas | Host and provider |
+| Provide model access, tool permissions, and runtime isolation | Host/provider configuration |
+| Coordinate tasks, assign ownership, reconcile results | SwarmForge instructions executed by the coordinator |
+| Execute an optional external bridge | User-configured external integration |
+| Validate this repository's package | Maintainer scripts and CI |
 
-- `pending`: planned but not dispatched.
-- `ready`: dependencies satisfied and capacity available.
-- `running`: worker session confirmed active.
-- `blocked`: waiting on a dependency, permission, or resource.
-- `completed`: deliverable returned and accepted.
-- `failed`: execution ended unsuccessfully.
-- `cancelled`: intentionally stopped.
+The Skill may request a behavior; it cannot grant itself permissions or manufacture capabilities the host does not expose.
 
-A job is not an agent. Reports must distinguish queued tasks, active sessions, terminal sessions, and retries.
+## Optional external integrations
 
-## Collaboration topologies
+MCP servers, provider SDK services, local CLI process managers, remote queues, and CI worker pools are possible integration paths, not core SwarmForge components. They should be considered only when native host delegation is inadequate and an external integration is explicitly configured or separately requested.
 
-SwarmForge supports fan-out/fan-in, hierarchical supervisors, DAG pipelines, map/reduce, independent reviewer panels, competing hypotheses, peer teams, and hybrid execution. See [Orchestration patterns](ORCHESTRATION_PATTERNS.md).
+The adapter contract in [ADAPTER_CONTRACT.md](ADAPTER_CONTRACT.md) describes logical capabilities for such integrations. It is not a universal API schema or a shipped implementation.
 
-## Workspace isolation
+## Language policy
 
-Preferred approaches for concurrent code writers:
+The Skill package is Markdown and YAML and has no application-language requirement.
 
-1. Separate worktree or branch per writer.
-2. Patch-based contributions with one integrator.
-3. Non-overlapping file ownership in a shared filesystem.
-4. Serialized writes where overlap cannot be avoided.
+If a separate companion runtime is deliberately approved later, use the following preference:
+- **Rust:** default choice for a coordinator, scheduler, worker lifecycle, and provider/host adapters.
+- **C++:** narrow native integrations or performance-critical components where native interop provides a concrete benefit. Avoid duplicating the coordinator in two languages.
+- **Next.js:** only for a separately requested web interface. A web UI is not needed to install, invoke, or use the Skill.
 
-Read-only research can use a shared snapshot. Code changes should be integrated in a controlled workspace.
+These choices do not authorize adding a runtime or UI to the Skill package. Keep any future companion implementation separate and optional.
 
-## Failure and observability
+## Coordination model
 
-Represent provider errors, missing permissions, rate limits, timeouts, malformed results, and conflicts as visible task states. Retry only transient failures.
+When the host supports delegation, the coordinator:
+1. discovers the actual tools and limits;
+2. decomposes work into independent tasks and dependencies;
+3. assigns one owner and clear read/write boundaries per task;
+4. collects results and verifies claims;
+5. integrates changes in dependency order;
+6. runs final checks and reports evidence.
 
-A production adapter should expose task/session ID, provider/model, role, status, timestamps, retry count, workspace or patch reference, usage/cost when available, and error reason. Avoid logging prompts, source files, and secrets by default.
+For high-concurrency planning, distinguish active sessions from queued tasks, logical roles, completed work, and retries. See [Scaling to 500](SCALING_TO_500.md).
 
-## Related decisions
+## Related decision
 
-- [ADR 0001: Skill is the product](DECISIONS/0001-skill-is-the-product.md)
+- [ADR 0001: The Skill is the product](DECISIONS/0001-skill-is-the-product.md)

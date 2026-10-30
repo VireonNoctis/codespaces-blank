@@ -1,107 +1,121 @@
 # SwarmForge
 
-> A portable multi-agent orchestration Skill for coding agents. Coordinate specialist agents across supported hosts, with a design target of up to 500 concurrent sessions when the runtime, provider quotas, and infrastructure allow it.
+> A portable Agent Skill that helps coding assistants coordinate real subagents and agent teams already exposed by their host.
 
-SwarmForge is a **Skill**, not an IDE and not a hosted agent service. Its job is to make an AI coding assistant behave like a disciplined engineering lead: inspect the project, decompose work, delegate independent tasks, coordinate specialists, integrate their changes, and verify the result.
+SwarmForge is installed as a **Skill from this Git repository**. It gives a compatible coding assistant a reusable engineering-coordinator workflow: inspect the project, split complex work into independent tasks, delegate to available agents, integrate their results, verify the combined changes, and report what actually happened.
 
-It follows the Agent Skills format: a directory with a required `SKILL.md` and optional references, scripts, and metadata. This repository is itself the Skill package.
+The Skill is the product. It is not an IDE, hosted service, agent runtime, scheduler, database, or dashboard. It does not need a backend or a particular programming language.
 
-**Important:** A Skill can instruct a host to use tools that already exist. It cannot create model sessions, raise provider limits, or guarantee 500 concurrent agents by itself. Live parallel execution requires native subagent/team tools or a configured orchestration bridge. When those are absent, SwarmForge falls back to a truthful single-agent plan.
+## How it works
 
-## What SwarmForge is designed to do
+1. Install this repository as a Skill in a compatible AI host.
+2. Invoke SwarmForge for a task that genuinely benefits from parallel work.
+3. SwarmForge checks which delegation tools the current host actually exposes.
+4. It prefers the host's native subagents or agent teams, and uses only external integrations that are already configured.
+5. It assigns bounded tasks, tracks ownership and dependencies, integrates the results, and verifies the final work.
 
-- Break complex engineering work into dependency-aware tasks.
-- Use native subagents or agent teams where the host provides them.
-- Support external orchestration through configured MCP tools, provider APIs/SDKs, local CLI workers, or remote worker queues.
-- Coordinate architecture, research, implementation, testing, security, review, and integration roles.
-- Use fan-out/fan-in, hierarchical teams, DAG pipelines, map/reduce, independent reviewers, and hybrid provider workflows.
-- Control concurrency with global and per-provider limits, backpressure, budgets, retries, and cancellation.
-- Prevent edit collisions through isolated worktrees, patch-based contributions, or explicit file ownership.
-- Verify integrated changes and report evidence instead of trusting worker summaries.
+When a host does not expose live delegation, SwarmForge remains useful as a single agent: it creates the task graph and ready-to-use task briefs. It never pretends that workers were started.
 
-## The 500-agent target
+## What it provides
 
-500 is a **configurable global ceiling**, not the default number of agents to launch and not a promise that every AI product can reach it. Effective capacity is constrained by the lowest applicable host, provider, model, account, workspace, and budget limit.
+- Task decomposition and dependency-aware planning.
+- Native subagent and agent-team coordination where supported.
+- Clear worker briefs, ownership boundaries, and expected deliverables.
+- Concurrency, budget, retry, cancellation, and backpressure guidance.
+- Workspace and file-conflict prevention for parallel code changes.
+- Result collection, integration, independent review, and evidence-based verification.
+- A single-agent fallback for hosts without live delegation.
 
-SwarmForge must distinguish real active sessions from queued tasks, planned roles, and retries. It must never claim a 500-agent run unless 500 distinct worker sessions were actually admitted and observed. See [Scaling to 500](docs/SCALING_TO_500.md).
+## The 500-session ambition
 
-## Get started
+SwarmForge is designed with a configurable target ceiling of up to **500 active worker sessions**. That is an ambition for a capable host/runtime, not a feature the Skill can manufacture.
 
-1. Read [`SKILL.md`](SKILL.md), the portable agent playbook.
-2. Follow [Installation](docs/INSTALLATION.md) for Claude, ChatGPT/Codex, or another compatible host.
-3. Review [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md) to understand the host-specific differences.
-4. Select an execution approach from [Execution modes](docs/EXECUTION_MODES.md).
-5. Use native delegation first. Add an MCP/API/CLI/remote adapter only when needed.
-6. Validate the package locally:
+A Skill cannot create model sessions, override account or provider quotas, or provide compute. The real limit is whatever the host, provider, account, workspace, and approved budget permit. Increase concurrency in measured batches and report active sessions separately from queued tasks, completed work, and retries. See [Scaling to 500](docs/SCALING_TO_500.md).
+
+## Install
+
+Use the install path documented by your AI host. The repository root is the Skill directory and contains `SKILL.md`.
+
+- [Installation instructions](docs/INSTALLATION.md)
+- [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md)
+
+The portable package can be read and installed without API keys, a database, a compiled binary, or a web service. Do not treat an optional bridge as a prerequisite.
+
+## Optional integrations
+
+Native host delegation is the default. A preconfigured MCP bridge, provider API/SDK, local CLI worker, or remote worker pool may be used only when it is actually available and authorized. Those systems are external integrations; this repository does not ship them.
+
+Do not build or deploy an external orchestrator just to install SwarmForge. See [Execution modes](docs/EXECUTION_MODES.md) and the [adapter contract](docs/ADAPTER_CONTRACT.md) only when an external integration is genuinely needed.
+
+## Language and implementation policy
+
+The Skill itself is Markdown with small YAML metadata. It has no application runtime, so **Rust, C++, and Next.js are not required to install or use it**. The Python script in this repository is maintainer-only package validation; Python is not a Skill runtime dependency.
+
+If a separate companion implementation is deliberately commissioned later, the preferred choices are:
+
+- **Rust** for the core coordinator, scheduling, lifecycle management, and adapters.
+- **C++** for narrowly scoped native integrations or genuinely performance-sensitive components—not a second implementation of the whole coordinator.
+- **Next.js** only for an independently requested web interface. A dashboard is not part of the Skill and is not needed for agent delegation.
+
+These are future implementation preferences, not shipped features or dependencies.
+
+## Repository layout
+
+~~~text
+.
+├── SKILL.md                 # Portable Skill entrypoint
+├── agents/                  # Optional host metadata
+├── docs/                    # Installation, patterns, security, and references
+├── scripts/                 # Maintainer-only validation
+└── tests/                   # Package smoke tests
+~~~
+
+## Validate changes
+
+Maintainers can run the package checks with Python 3 and its standard library:
 
 ~~~bash
 python3 scripts/validate.py
 python3 -m unittest discover -s tests -v
 ~~~
 
-No provider key is required to read or install the Skill. External execution services require their own credentials and terms. Keep credentials in the relevant secret manager or environment, never in the Skill files or prompts.
+These checks validate the Skill package. They do not test provider integrations or prove 500-session capacity.
 
-## Repository structure
+## Principles
 
-~~~text
-.
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-├── docs/
-│   ├── ADAPTER_CONTRACT.md
-│   ├── ARCHITECTURE.md
-│   ├── EXECUTION_MODES.md
-│   ├── INSTALLATION.md
-│   ├── ORCHESTRATION_PATTERNS.md
-│   ├── PLATFORM_COMPATIBILITY.md
-│   ├── SCALING_TO_500.md
-│   ├── SECURITY_MODEL.md
-│   ├── SOURCES.md
-│   ├── WORKFLOWS.md
-│   └── DECISIONS/
-├── scripts/
-│   └── validate.py
-└── tests/
-    └── test_skill_package.py
-~~~
+**Portable by default.** Keep the core workflow host- and vendor-neutral.
 
-## Core principles
+**Native first.** Prefer the delegation tools the current host already provides.
 
-**Skill first.** The portable workflow is the product. Runtime adapters are optional.
+**Optional means optional.** Never require an external service, account key, database, or UI for the Skill to work.
 
-**Capability-aware.** Use only tools and limits confirmed by the current host.
+**Honest capacity.** Never claim a worker exists or a concurrency target was reached without evidence.
 
-**Parallelize independence.** Do not spawn agents for trivial work or tightly coupled steps.
-
-**Bounded execution.** Concurrency, cost, retries, tool access, and runtime are controlled.
-
-**Isolated changes.** Concurrent writers should not share mutable files without ownership or locking.
-
-**Verified outcomes.** Integrate, test, review, and report what actually happened.
+**Controlled parallelism.** Give workers clear scope, isolate writes, and verify the integrated result.
 
 ## Scope today
 
-This repository contains the portable Skill, cross-platform installation guidance, orchestration designs, adapter contracts, security guidance, and validation tooling. It does **not** currently ship a production orchestrator, MCP server, provider API integration, remote worker fleet, or 500-agent load test. These are extension paths documented for implementation; they are not represented as existing functionality.
+This repository contains the Skill instructions, optional host metadata, documentation, and package validation. It does not contain a production orchestration runtime, MCP server, provider integration, remote worker fleet, web dashboard, or 500-agent load test.
 
 ## Documentation
 
 | Topic | Document |
 |---|---|
-| Overall system design | [Architecture](docs/ARCHITECTURE.md) |
-| Native, MCP, API, CLI, queue, and CI options | [Execution modes](docs/EXECUTION_MODES.md) |
-| Different ways to coordinate agents | [Orchestration patterns](docs/ORCHESTRATION_PATTERNS.md) |
-| Host setup | [Installation](docs/INSTALLATION.md) |
-| Claude, ChatGPT/Codex, VS Code, and other hosts | [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md) |
-| Capacity planning and 500 sessions | [Scaling to 500](docs/SCALING_TO_500.md) |
-| Building an external bridge | [Adapter contract](docs/ADAPTER_CONTRACT.md) |
-| Permissions and isolation | [Security model](docs/SECURITY_MODEL.md) |
-| Repeatable engineering recipes | [Workflows](docs/WORKFLOWS.md) |
-| Official documentation links | [Sources](docs/SOURCES.md) |
+| Skill workflow | [SKILL.md](SKILL.md) |
+| Install the Skill | [Installation](docs/INSTALLATION.md) |
+| Supported host surfaces | [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md) |
+| Product boundaries | [Architecture](docs/ARCHITECTURE.md) |
+| Native and optional execution paths | [Execution modes](docs/EXECUTION_MODES.md) |
+| Coordination patterns | [Orchestration patterns](docs/ORCHESTRATION_PATTERNS.md) |
+| 500-session capacity model | [Scaling to 500](docs/SCALING_TO_500.md) |
+| Optional integrations | [Adapter contract](docs/ADAPTER_CONTRACT.md) |
+| Security guidance | [Security model](docs/SECURITY_MODEL.md) |
+| Example workflows | [Workflows](docs/WORKFLOWS.md) |
+| Maintaining this package | [Project setup](docs/PROJECT_SETUP.md) |
 
 ## Contributing
 
-Read [AGENTS.md](AGENTS.md) before contributing. Keep the root Skill portable, put vendor-specific behavior in references, and verify current official documentation before adding compatibility claims.
+Read [AGENTS.md](AGENTS.md) before making changes. Keep the Skill portable, make the smallest complete change, and distinguish shipped functionality from designs for optional external integrations.
 
 ## License
 

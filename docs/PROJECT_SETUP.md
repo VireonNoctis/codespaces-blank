@@ -1,37 +1,48 @@
-# SwarmForge Setup and Validation
+# Skill Development and Validation
 
-This is a portable Agent Skill package. It is not a runtime service.
+SwarmForge is a portable Agent Skill. This document is for maintaining this repository; it is not a setup guide for a separate runtime.
 
-## Install the Skill
+## Install and use
 
-Install the whole repository directory in the host's documented Skill location. The root must contain `SKILL.md`. Use [INSTALLATION.md](INSTALLATION.md) for host-specific paths and [PLATFORM_COMPATIBILITY.md](PLATFORM_COMPATIBILITY.md) for supported surfaces.
+Install the repository root as a Skill using the path documented by your AI host. The root must remain together with `SKILL.md` and the supporting files it references.
 
-## Choose an execution backend
+See:
+- [Installation](INSTALLATION.md)
+- [Platform compatibility](PLATFORM_COMPATIBILITY.md)
 
-1. Prefer native subagents or agent teams exposed by the host.
-2. Use an already configured MCP orchestration bridge when multiple clients need the same worker service.
-3. Use a provider API/SDK orchestrator when custom routing, quotas, and lifecycle control are required.
-4. Use local CLI workers for developer-machine execution.
-5. Use a durable remote queue and isolated worker fleet for workloads that justify operating infrastructure.
-6. Fall back to a single-agent task plan when no real delegation mechanism is available.
+No compiled binary, package manager, API key, database, or external service is required to install or use the portable Skill. Live delegation depends on the capabilities the host exposes.
 
-Compare the choices in [EXECUTION_MODES.md](EXECUTION_MODES.md).
+## Validate the package
 
-## Package checks
+Maintainers need Python 3 to run the standard-library validation tools:
 
-Run from the repository root:
-
-```bash
+~~~bash
 python3 scripts/validate.py
 python3 -m unittest discover -s tests -v
-```
+~~~
 
-The GitHub Actions workflow runs these checks on pushes and pull requests.
+Python is used only for package validation. It is not part of the Skill's runtime and is not required by users of the Skill.
 
-## Adding a provider adapter
+The GitHub Actions workflow runs the same package checks on pushes and pull requests. Passing these checks validates package structure and smoke tests; it does not prove compatibility with every AI host or demonstrate 500 concurrent sessions.
 
-Read [ADAPTER_CONTRACT.md](ADAPTER_CONTRACT.md). Implement real capability discovery, worker creation, status, waiting, cancellation, result collection, and workspace controls. Do not add guessed provider APIs or expose credentials in Skill files.
+## Optional external integrations
 
-## Before claiming 500-agent support
+Do not create a backend as part of routine Skill installation or maintenance. If a separate external integration is explicitly approved, start with [Execution modes](EXECUTION_MODES.md) and [Adapter contract](ADAPTER_CONTRACT.md). Keep the integration optional and separate from the portable Skill.
 
-Review [SCALING_TO_500.md](SCALING_TO_500.md). A 500-session claim requires a real orchestrator, provider capacity, isolated workspaces, cost controls, and repeatable concurrency/load-test evidence. The Skill alone does not supply these.
+## Preferred languages for a separately approved companion
+
+The Skill itself has no language requirement. If future work explicitly calls for a separate implementation:
+
+- **Rust** is the preferred language for the coordinator, scheduler, and worker lifecycle.
+- **C++** is reserved for focused native integrations or performance-critical components with a demonstrated need.
+- **Next.js** is reserved for an optional web interface that is separately requested.
+
+Do not introduce these runtimes or a dashboard into this repository just to make the Skill installable. Any companion application should remain independently deployable and must not be required for the core Skill workflow.
+
+## Before making capability claims
+
+Check current official documentation for the specific host surface. Distinguish:
+- Skill discovery from agent-spawning capability;
+- a configured integration from one merely described in documentation;
+- a queued task from an active worker session;
+- design targets from measured runtime capacity.
