@@ -1,83 +1,108 @@
-# Project Name
+# SwarmForge
 
-> Replace this sentence with a clear, one-line description of what this project does.
+> A portable multi-agent orchestration Skill for coding agents. Coordinate specialist agents across supported hosts, with a design target of up to 500 concurrent sessions when the runtime, provider quotas, and infrastructure allow it.
 
-A clean, language-neutral foundation for building and maintaining software projects. It gives every new repository a consistent development environment, sensible defaults, quality checks, and security hygiene without choosing your architecture or dependencies for you.
+SwarmForge is a **Skill**, not an IDE and not a hosted agent service. Its job is to make an AI coding assistant behave like a disciplined engineering lead: inspect the project, decompose work, delegate independent tasks, coordinate specialists, integrate their changes, and verify the result.
 
-## Start here
+It follows the Agent Skills format: a directory with a required `SKILL.md` and optional references, scripts, and metadata. This repository is itself the Skill package.
 
-1. Rename the project and rewrite this README so it describes the actual product.
-2. Read [the project setup checklist](docs/PROJECT_SETUP.md).
-3. Choose the language, runtime versions, package manager, and application structure.
-4. Add the real build, test, lint, and formatting commands to the CI workflow.
-5. Choose and add a license before publishing or distributing the project.
-6. Remove anything that does not belong in this project.
+**Important:** A Skill can instruct a host to use tools that already exist. It cannot create model sessions, raise provider limits, or guarantee 500 concurrent agents by itself. Live parallel execution requires native subagent/team tools or a configured orchestration bridge. When those are absent, SwarmForge falls back to a truthful single-agent plan.
 
-## Development environment
+## What SwarmForge is designed to do
 
-**GitHub Codespaces** is ready to use through `.devcontainer/devcontainer.json`. The workspace uses the Dev Containers Universal image so you can start with a broad set of common development tools, then add only the runtime-specific tooling your project needs.
+- Break complex engineering work into dependency-aware tasks.
+- Use native subagents or agent teams where the host provides them.
+- Support external orchestration through configured MCP tools, provider APIs/SDKs, local CLI workers, or remote worker queues.
+- Coordinate architecture, research, implementation, testing, security, review, and integration roles.
+- Use fan-out/fan-in, hierarchical teams, DAG pipelines, map/reduce, independent reviewers, and hybrid provider workflows.
+- Control concurrency with global and per-provider limits, backpressure, budgets, retries, and cancellation.
+- Prevent edit collisions through isolated worktrees, patch-based contributions, or explicit file ownership.
+- Verify integrated changes and report evidence instead of trusting worker summaries.
 
-For local development, use your preferred editor. The repository includes:
+## The 500-agent target
 
-- `.editorconfig` and `.gitattributes` for consistent files.
-- `.vscode/` recommendations and shared workspace settings.
-- `.pre-commit-config.yaml` for common hygiene checks.
-- `AGENTS.md` with guidance for coding agents and contributors.
+500 is a **configurable global ceiling**, not the default number of agents to launch and not a promise that every AI product can reach it. Effective capacity is constrained by the lowest applicable host, provider, model, account, workspace, and budget limit.
 
-## Quality and automation
+SwarmForge must distinguish real active sessions from queued tasks, planned roles, and retries. It must never claim a 500-agent run unless 500 distinct worker sessions were actually admitted and observed. See [Scaling to 500](docs/SCALING_TO_500.md).
 
-| Tooling | Purpose |
-| --- | --- |
-| GitHub Actions | Validates the starter configuration on pushes and pull requests. |
-| OpenSSF Scorecard | Periodically evaluates repository security practices. |
-| Dependabot | Keeps GitHub Actions dependencies up to date. |
-| Pre-commit | Catches whitespace, malformed config, merge markers, and private-key mistakes before commits. |
-| `scripts/validate.py` | Checks the template's own JSON configuration and pinned workflow actions. |
+## Get started
 
-These checks are a baseline, not a substitute for project tests. Add your language's formatter, linter, type checker, unit tests, integration tests, and build to `.github/workflows/ci.yml` once the stack is chosen. Keep required checks fast, deterministic, and reproducible.
+1. Read [`SKILL.md`](SKILL.md), the portable agent playbook.
+2. Follow [Installation](docs/INSTALLATION.md) for Claude, ChatGPT/Codex, or another compatible host.
+3. Review [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md) to understand the host-specific differences.
+4. Select an execution approach from [Execution modes](docs/EXECUTION_MODES.md).
+5. Use native delegation first. Add an MCP/API/CLI/remote adapter only when needed.
+6. Validate the package locally:
 
-### Run the baseline checks
-
-```bash
+~~~bash
 python3 scripts/validate.py
-```
+python3 -m unittest discover -s tests -v
+~~~
 
-Install the optional local Git hooks:
+No provider key is required to read or install the Skill. External execution services require their own credentials and terms. Keep credentials in the relevant secret manager or environment, never in the Skill files or prompts.
 
-```bash
-python3 -m pip install pre-commit
-pre-commit install
-pre-commit run --all-files
-```
+## Repository structure
 
-## Repository map
-
-```text
+~~~text
 .
-├── .devcontainer/       Codespaces and Dev Container setup
-├── .github/             CI, security automation, issue and PR templates
-├── .vscode/             Shared editor settings and recommendations
-├── docs/                Setup notes, architecture, and decision records
-├── scripts/             Small, dependency-free developer utilities
-├── AGENTS.md            Guidance for coding agents
-├── CONTRIBUTING.md      Contribution workflow
-├── SECURITY.md          Vulnerability reporting guidance
-└── README.md            Project entry point
-```
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+├── docs/
+│   ├── ADAPTER_CONTRACT.md
+│   ├── ARCHITECTURE.md
+│   ├── EXECUTION_MODES.md
+│   ├── INSTALLATION.md
+│   ├── ORCHESTRATION_PATTERNS.md
+│   ├── PLATFORM_COMPATIBILITY.md
+│   ├── SCALING_TO_500.md
+│   ├── SECURITY_MODEL.md
+│   ├── SOURCES.md
+│   ├── WORKFLOWS.md
+│   └── DECISIONS/
+├── scripts/
+│   └── validate.py
+└── tests/
+    └── test_skill_package.py
+~~~
 
-## Engineering principles
+## Core principles
 
-- Prefer the smallest complete solution over unnecessary abstraction.
-- Keep dependencies intentional and explain non-obvious choices.
-- Make changes reviewable; avoid unrelated formatting or churn.
-- Treat errors, permissions, input validation, and secrets as first-class concerns.
-- Document real decisions and trade-offs, not speculative architecture.
-- Never claim a test, build, or security check passed unless it was actually run.
+**Skill first.** The portable workflow is the product. Runtime adapters are optional.
 
-## Security
+**Capability-aware.** Use only tools and limits confirmed by the current host.
 
-Do not commit credentials, private keys, tokens, production data, or local environment files. Keep secrets in the relevant deployment platform's secret manager. See [SECURITY.md](SECURITY.md) for reporting guidance and [the setup checklist](docs/PROJECT_SETUP.md) for recommended repository settings.
+**Parallelize independence.** Do not spawn agents for trivial work or tightly coupled steps.
+
+**Bounded execution.** Concurrency, cost, retries, tool access, and runtime are controlled.
+
+**Isolated changes.** Concurrent writers should not share mutable files without ownership or locking.
+
+**Verified outcomes.** Integrate, test, review, and report what actually happened.
+
+## Scope today
+
+This repository contains the portable Skill, cross-platform installation guidance, orchestration designs, adapter contracts, security guidance, and validation tooling. It does **not** currently ship a production orchestrator, MCP server, provider API integration, remote worker fleet, or 500-agent load test. These are extension paths documented for implementation; they are not represented as existing functionality.
+
+## Documentation
+
+| Topic | Document |
+|---|---|
+| Overall system design | [Architecture](docs/ARCHITECTURE.md) |
+| Native, MCP, API, CLI, queue, and CI options | [Execution modes](docs/EXECUTION_MODES.md) |
+| Different ways to coordinate agents | [Orchestration patterns](docs/ORCHESTRATION_PATTERNS.md) |
+| Host setup | [Installation](docs/INSTALLATION.md) |
+| Claude, ChatGPT/Codex, VS Code, and other hosts | [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md) |
+| Capacity planning and 500 sessions | [Scaling to 500](docs/SCALING_TO_500.md) |
+| Building an external bridge | [Adapter contract](docs/ADAPTER_CONTRACT.md) |
+| Permissions and isolation | [Security model](docs/SECURITY_MODEL.md) |
+| Repeatable engineering recipes | [Workflows](docs/WORKFLOWS.md) |
+| Official documentation links | [Sources](docs/SOURCES.md) |
+
+## Contributing
+
+Read [AGENTS.md](AGENTS.md) before contributing. Keep the root Skill portable, put vendor-specific behavior in references, and verify current official documentation before adding compatibility claims.
 
 ## License
 
-No license is included intentionally. Choose the license that matches this project's ownership and distribution model, then add the complete license text and update this section. Until a license is added, do not assume others have permission to reuse or distribute the project.
+No license is included yet. Until a license is selected and added, do not assume permission to reuse, modify, or redistribute this repository.

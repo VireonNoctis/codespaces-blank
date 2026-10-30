@@ -1,89 +1,103 @@
 #!/usr/bin/env python3
-"""Validate the template's own configuration without third-party packages."""
+"""Validate the SwarmForge Agent Skill package with the Python standard library."""
 
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG_FILES = (
-    ".devcontainer/devcontainer.json",
-    ".vscode/extensions.json",
-    ".vscode/settings.json",
+SKILL = ROOT / "SKILL.md"
+REQUIRED = (
+    "docs/ARCHITECTURE.md",
+    "docs/ADAPTER_CONTRACT.md",
+    "docs/EXECUTION_MODES.md",
+    "docs/INSTALLATION.md",
+    "docs/ORCHESTRATION_PATTERNS.md",
+    "docs/PLATFORM_COMPATIBILITY.md",
+    "docs/SCALING_TO_500.md",
+    "docs/SECURITY_MODEL.md",
+    "docs/SOURCES.md",
+    "docs/WORKFLOWS.md",
 )
-WORKFLOW_DIR = Path(".github/workflows")
-ACTION_REFERENCE = re.compile(r"^[0-9a-fA-F]{40}$")
+LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
+FIELD = re.compile(r"^([a-z][a-z0-9_-]*):\s*(.*?)\s*$")
+SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
-def validate_json_files() -> list[str]:
+def frontmatter() -> list[str]:
     errors: list[str] = []
+    try:
+        text = SKILL.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"SKILL.md: cannot read ({exc})"]
 
-    for relative_path in CONFIG_FILES:
-        path = ROOT / relative_path
-        if not path.exists():
+    if not text.startswith("---\n"):
+        return ["SKILL.md: frontmatter must begin on line 1"]
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        return ["SKILL.md: frontmatter closing delimiter is missing"]
+
+    values: dict[str, str] = {}
+    for number, line in enumerate(text[4:end].splitlines(), 2):
+        if not line or line.startswith((" ", "\t", "#")):
             continue
+        match = FIELD.fullmatch(line)
+        if match:
+            values[match.group(1)] = match.group(2).strip().strip("\"'")
+        else:
+            errors.append(f"SKILL.md:{number}: unsupported frontmatter line")
 
-        try:
-            json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-            errors.append(f"{relative_path}: invalid JSON ({exc})")
-
+    name = values.get("name", "")
+    description = values.get("description", "")
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) or len(name) > 64:
+        errors.append("SKILL.md: name must be a lowercase hyphenated slug (max 64 chars)")
+    if not description or len(description) > 1024:
+        errors.append("SKILL.md: description is required and must be <= 1024 chars")
+    compatibility = values.get("compatibility", "")
+    if len(compatibility) > 500:
+        errors.append("SKILL.md: compatibility must be <= 500 chars")
     return errors
 
 
-def validate_action_pins() -> list[str]:
+def local_links() -> list[str]:
     errors: list[str] = []
-    workflow_root = ROOT / WORKFLOW_DIR
-
-    if not workflow_root.exists():
-        return errors
-
-    for path in sorted((*workflow_root.rglob("*.yml"), *workflow_root.rglob("*.yaml"))):
+    candidates = [ROOT / "README.md", SKILL]
+    candidates.extend((ROOT / "docs").rglob("*.md"))
+    for path in candidates:
         try:
-            lines = path.read_text(encoding="utf-8").splitlines()
-        except (OSError, UnicodeError) as exc:
-            errors.append(f"{path.relative_to(ROOT)}: cannot read workflow ({exc})")
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            errors.append(f"{path.relative_to(ROOT)}: cannot read ({exc})")
             continue
-
-        for line_number, line in enumerate(lines, start=1):
-            stripped = line.strip()
-            if not stripped.startswith("uses:"):
+        for raw in LINK.findall(text):
+            target = raw.strip().split("#", 1)[0]
+            if not target or urlparse(target).scheme or target.startswith("/"):
                 continue
-
-            reference = stripped.split(":", 1)[1].split("#", 1)[0].strip().strip("'\"")
-            if reference.startswith(("./", "docker://")):
+            resolved = (path.parent / target).resolve()
+            try:
+                resolved.relative_to(ROOT.resolve())
+            except ValueError:
+                errors.append(f"{path.relative_to(ROOT)}: link escapes repository: {target}")
                 continue
-
-            if "@" not in reference:
-                errors.append(
-                    f"{path.relative_to(ROOT)}:{line_number}: "
-                    f"Action reference is not pinned: {reference}"
-                )
-                continue
-
-            revision = reference.rsplit("@", 1)[1]
-            if not ACTION_REFERENCE.fullmatch(revision):
-                errors.append(
-                    f"{path.relative_to(ROOT)}:{line_number}: "
-                    f"Action must use a full 40-character commit SHA: {reference}"
-                )
-
+            if not resolved.exists():
+                errors.append(f"{path.relative_to(ROOT)}: broken local link: {target}")
     return errors
 
 
 def main() -> int:
-    errors = validate_json_files()
-    errors.extend(validate_action_pins())
+    errors = frontmatter()
+    for rel in REQUIRED:
+        if not (ROOT / rel).is_file():
+            errors.append(f"required document missing: {rel}")
+    errors.extend(local_links())
 
     if errors:
-        for error in errors:
-            print(f"ERROR: {error}", file=sys.stderr)
+        print("\n".join(f"ERROR: {item}" for item in errors), file=sys.stderr)
         return 1
-
-    print("Repository configuration checks passed.")
+    print("SwarmForge Skill package checks passed.")
     return 0
 
 
