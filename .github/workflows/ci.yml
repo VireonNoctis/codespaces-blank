@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Repository validation
+    name: Validate Skill package
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      - name: Validate starter configuration
+      - name: Validate Skill
         run: python3 scripts/validate.py
+      - name: Run smoke tests
+        run: python3 -m unittest discover -s tests -v

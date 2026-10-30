@@ -1,46 +1,37 @@
-# Project Setup Checklist
+# SwarmForge Setup and Validation
 
-Use this checklist when creating a project from the template. Delete or adapt sections that do not apply.
+This is a portable Agent Skill package. It is not a runtime service.
 
-## Identity and ownership
+## Install the Skill
 
-- [ ] Set the repository and application name.
-- [ ] Replace the template README with the product's purpose, features, screenshots or examples, and actual usage instructions.
-- [ ] Add the maintainer or organization details.
-- [ ] Choose a license deliberately and add the complete license text. This template does not choose one for you.
-- [ ] Decide whether the project is public, private, or internal.
+Install the whole repository directory in the host's documented Skill location. The root must contain `SKILL.md`. Use [INSTALLATION.md](INSTALLATION.md) for host-specific paths and [PLATFORM_COMPATIBILITY.md](PLATFORM_COMPATIBILITY.md) for supported surfaces.
 
-## Technology
+## Choose an execution backend
 
-- [ ] Choose supported language and runtime versions.
-- [ ] Choose one package manager and commit its lockfile.
-- [ ] Add the actual project structure and entry points.
-- [ ] Document reproducible installation, development, build, and test commands.
-- [ ] Add formatting, linting, type checking, and tests for the selected stack.
-- [ ] Update `.devcontainer/devcontainer.json` with project-specific tools, services, ports, and extensions.
-- [ ] Add any required environment variable names to `.env.example`, using safe sample values only.
+1. Prefer native subagents or agent teams exposed by the host.
+2. Use an already configured MCP orchestration bridge when multiple clients need the same worker service.
+3. Use a provider API/SDK orchestrator when custom routing, quotas, and lifecycle control are required.
+4. Use local CLI workers for developer-machine execution.
+5. Use a durable remote queue and isolated worker fleet for workloads that justify operating infrastructure.
+6. Fall back to a single-agent task plan when no real delegation mechanism is available.
 
-## Continuous integration
+Compare the choices in [EXECUTION_MODES.md](EXECUTION_MODES.md).
 
-- [ ] Extend `.github/workflows/ci.yml` with the real build and test commands.
-- [ ] Test the workflow on a pull request before making it a required check.
-- [ ] Keep third-party Actions pinned to full commit SHAs and let Dependabot propose updates.
-- [ ] Add release, deployment, and artifact workflows only when the project needs them.
+## Package checks
 
-## Repository security and maintenance
+Run from the repository root:
 
-- [ ] Enable Dependabot alerts and dependency updates.
-- [ ] Enable secret scanning and push protection when available for the repository.
-- [ ] Enable private vulnerability reporting.
-- [ ] Review the OpenSSF Scorecard report and address relevant findings.
-- [ ] Protect the default branch with a ruleset or branch protection policy.
-- [ ] Require review and passing checks appropriate to the project's risk.
-- [ ] Store deployment credentials in GitHub Actions or the target platform's secret manager.
-- [ ] Review the permissions granted to every workflow and third-party Action.
+```bash
+python3 scripts/validate.py
+python3 -m unittest discover -s tests -v
+```
 
-## Remove template-only material
+The GitHub Actions workflow runs these checks on pushes and pull requests.
 
-- [ ] Replace this checklist with project-specific onboarding instructions.
-- [ ] Update `AGENTS.md` with real commands, architecture boundaries, and repository-specific constraints.
-- [ ] Remove tools or community files that do not fit the project.
-- [ ] Check links, examples, and badges after renaming the repository.
+## Adding a provider adapter
+
+Read [ADAPTER_CONTRACT.md](ADAPTER_CONTRACT.md). Implement real capability discovery, worker creation, status, waiting, cancellation, result collection, and workspace controls. Do not add guessed provider APIs or expose credentials in Skill files.
+
+## Before claiming 500-agent support
+
+Review [SCALING_TO_500.md](SCALING_TO_500.md). A 500-session claim requires a real orchestrator, provider capacity, isolated workspaces, cost controls, and repeatable concurrency/load-test evidence. The Skill alone does not supply these.
