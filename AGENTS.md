@@ -53,7 +53,7 @@ For websites and browser-based products, use this as a launch review. Do not add
 - Use a clear heading hierarchy. Normally, each page should have one main `h1`; do not omit the main heading or add multiple page-level headings without a real reason.
 - Set canonical URLs where duplicate or alternate URLs make that useful.
 - Consider an `llms.txt` when it would genuinely help people or tools understand a substantial public site or documentation set; do not add it as empty decoration.
-- Review `robots.txt intentionally. Do not block AI crawlers by accident; make crawler access a deliberate site policy.
+- Review `robots.txt` intentionally. Do not block AI crawlers by accident; make crawler access a deliberate site policy.
 - Include a favicon and appropriate app icons.
 - Provide a `sitemap.xml` for sites with indexable pages where it is useful.
 - Set the document language correctly with the `lang` attribute.
