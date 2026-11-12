@@ -92,11 +92,10 @@ These checks are a way to catch avoidable problems, not a reason to overbuild. M
 
 ---
 
-# UI/UX Research Standards — @synsation_
+# UI/UX Standards
 
-This section distils the public **Build for Good UX** and **Dark Side of UX** series by [@synsation_](https://www.instagram.com/synsation_/) into implementation guidance. Use it as a practical design and engineering reference alongside the standards above. It is a synthesis of public posts and cross-posted captions/transcripts, not a verbatim transcript or a claim that every heuristic is universally valid.
+Use this section as a practical design and engineering reference alongside the standards above. 
 
-**Research checked:** 12 November 2026
 
 ## Core product principle: design the experience, not just the screen
 
@@ -315,10 +314,6 @@ Also:
 - Avoid layout shifts when state changes.
 - Respect reduced-motion preferences and keep motion purposeful.
 
-## Ethical UX — do not implement dark patterns
-
-The “Dark Side of UX” series is a catalogue of manipulative patterns to recognize and avoid. Do not convert these into growth tactics or product requirements.
-
 ### Cancellation obstruction / “Roach Motel”
 
 A pattern where joining is easy but leaving is unusually difficult.
@@ -346,7 +341,6 @@ Adding obstacles can exploit low motivation at the moment a user tries to leave.
 
 ### Social pressure and emotional manipulation
 
-Research discussed in the series describes how people can apply social expectations to computers and interfaces even when they know they are interacting with software. Button copy can therefore feel like judgment rather than neutral choice.
 
 - Keep decline choices neutral, direct, and respectful.
 - Do not manufacture guilt, shame, fear, or social pressure to influence an optional decision.
@@ -399,51 +393,3 @@ Before marking a feature complete, check the items that apply:
 - [ ] Motion is purposeful and respects reduced-motion preferences.
 - [ ] No cancellation, retention, shame, or attention-capture dark pattern has been added.
 - [ ] The feature has been tested with slow connections and realistic failure cases.
-
-## Research index — Build for Good UX (Parts 1–19)
-
-The table maps the creator's numbered posts to the topics verified in public captions, transcripts, or indexed source pages. Summaries are paraphrases, not quotations.
-
-| Part | Topic | Engineering takeaway | Source |
-|---|---|---|---|
-| 1 | UI vs UX | Visual polish is not enough; design for predictable actions, trust, and non-happy paths. | [Instagram](https://www.instagram.com/reel/DYIHYJCIAeT/) · [YouTube](https://www.youtube.com/shorts/w90jr50IvKw) |
-| 2 | Loading history | Introduces loading states and how waiting experiences evolved. The indexed public caption was available; a full transcript was not retrieved. | [Instagram](https://www.instagram.com/reel/DYXxwf-BZpp/) |
-| 3 | Loading patterns | Choose skeleton screens, progress bars, inline spinners, or optimistic UI based on the task. | [Instagram](https://www.instagram.com/reel/DYcbCoiIKK1/) |
-| 4 | Spinner psychology | Avoid flashing loaders; contextualize waits and use progress/steps for longer operations. | [Instagram](https://www.instagram.com/reel/DYkRtX1oKKN/) · [YouTube](https://www.youtube.com/shorts/lLL5GcUlpZs) |
-| 5 | Error messages | Explain what happened, why when known, and what to do; never expose backend internals or silently fail. | [Instagram](https://www.instagram.com/reel/DYr7cKLIQo6/) · [YouTube](https://www.youtube.com/shorts/_bdeeAKLO6g) |
-| 6 | Forms | Make requirements visible, validate inline, prefill known data, show limits/password rules, and accept reasonable formatting. | [Instagram](https://www.instagram.com/reel/DYyzrdpIixM/) · [YouTube](https://www.youtube.com/shorts/lulIaQ41TRA) |
-| 7 | Toast vs modal vs inline | Match feedback placement to severity; blocking dialogs need a way forward. | [Instagram](https://www.instagram.com/reel/DY0IImqxNQ0/) · [TikTok](https://www.tiktok.com/@synsation_/video/7657018940891155725) |
-| 8 | Empty states | Explain why content is absent and provide a useful first action. | [Instagram](https://www.instagram.com/reel/DY5PkUjyhMv/) |
-| 9 | Partial states | Load available content; independent sections should not wait for every other section. | [Instagram](https://www.instagram.com/reel/DY-yUBsMbml/) |
-| 10 | Graceful degradation | Give each section its own data, loading, error, and retry behavior. | [Instagram](https://www.instagram.com/reel/DZIHbbIt5mc/) · [YouTube](https://www.youtube.com/shorts/WX5cvNerDm0) |
-| 11 | Success states | Confirm meaningful actions clearly; keep small confirmations subtle and proportionate. | [Instagram](https://www.instagram.com/reel/DZYfsYPv1-l/) · [YouTube](https://www.youtube.com/shorts/Ja4bXssAhw8) |
-| 12 | Jakob's Law | Users expect familiar patterns based on other products they use. | [Instagram](https://www.instagram.com/reel/DZmMJ_HAHBj/) · [YouTube](https://www.youtube.com/shorts/W6rCWZaADKA) |
-| 13 | Jakob's Law continued | Adapt conventions to device, thumb reach, locale, and writing direction. | [Instagram](https://www.instagram.com/reel/DZ-c-4BMXIn/) · [YouTube](https://www.youtube.com/shorts/7nwR9dZgbRA) |
-| 14 | Hick's Law | Reduce choice complexity through grouping, filters, and staged decisions. | [Instagram](https://www.instagram.com/reel/DayWu1zy-qz/) · [YouTube](https://www.youtube.com/shorts/ZC9KWn8-kRo) |
-| 15 | Progressive disclosure | Reveal what is needed now; make advanced options discoverable without overwhelming users. | [Instagram](https://www.instagram.com/reel/DbFV7_6R8Rn/) · [YouTube](https://www.youtube.com/shorts/BQV0L-JmR4g) |
-| 16 | Tesler's Law | Complexity cannot always be removed; the product should absorb avoidable work rather than offload it. | [Instagram](https://www.instagram.com/reel/DbKj0Ewuzlr/) · [YouTube](https://www.youtube.com/shorts/vgzU7UfCJns) |
-| 17 | Button states | Default, hover, focus, pressed, loading, and disabled each need intentional behavior. | [Instagram](https://www.instagram.com/reel/DcjkR2PSkml/) · [YouTube](https://www.youtube.com/shorts/SWzFaVOMcK8) |
-| 18 | Disabled buttons | Explain why an action is unavailable; consider enabled validation on activation when that is clearer and more accessible. | [Instagram](https://www.instagram.com/reel/DcugS9HAFAj/) |
-| 19 | Fitts's Law | Use comfortable hit areas, good spacing, thumb-aware placement, and careful gesture handling. | [Instagram](https://www.instagram.com/reel/Dc2Z_OyBWtc/) · [TikTok](https://www.tiktok.com/@synsation_/video/7681515661906005262) |
-
-## Research index — Dark Side of UX (Parts 1–5)
-
-These posts examine manipulative patterns. The implementation standard is to recognize and avoid them.
-
-| Part | Topic | Avoid | Source |
-|---|---|---|---|
-| 1 | Roach Motel / cancellation obstruction | Easy signup paired with unusually difficult cancellation or forced offline steps. | [Instagram](https://www.instagram.com/reel/DbbX47eSehN/) |
-| 2 | Cancellation friction and loss aversion | Hidden cancellation controls, pause screens that obscure exit, automatic resumption without clear understanding, and pressure based on accumulated history. | [Instagram](https://www.instagram.com/reel/DbeHYe1SvFs/) · [YouTube](https://www.youtube.com/shorts/LtGzZG89v7Y) |
-| 3 | Retention offers and confirm-shaming | Exit-survey funnels, repeated bargaining, discounts designed around forgotten renewals, and guilt-based decline copy. | [Instagram](https://www.instagram.com/reel/DboSoFGP5Hw/) · [YouTube](https://www.youtube.com/shorts/ChxDSVvGwSw) |
-| 4 | Confirm-shaming and social pressure | Emotionally manipulative decline wording that frames a normal choice as irresponsible. | [Instagram](https://www.instagram.com/reel/Db7OvXgttSp/) |
-| 5 | Variable rewards and infinite scroll | Unbounded refresh/recommendation loops designed to remove natural stopping points or exploit attention. | [Instagram](https://www.instagram.com/reel/Dcoiu8ctw-r/) |
-
-## Source and interpretation notes
-
-- Primary profile: [@synsation_ on Instagram](https://www.instagram.com/synsation_/).
-- Public cross-posts on YouTube and TikTok were used where available to verify episode titles and spoken guidance.
-- Some transcript text was machine-generated or auto-captioned. Minor errors and language mismatches are possible; the principles here are paraphrased.
-- Part 2 of Build for Good UX was available through its public caption, but a complete transcript was not retrieved. Its description is intentionally limited to the loading-history introduction stated in the caption.
-- Episode numbering alone is not used to infer a topic. Where a caption or full transcript was unavailable, the file records that limitation rather than inventing details.
-- Timing thresholds and numerical claims in creator videos are teaching heuristics, not universal standards or independently verified benchmarks. Measure real performance and test with the product's users.
-- Apply judgment to the project's audience, stack, platform, accessibility needs, security constraints, and observed behavior.
