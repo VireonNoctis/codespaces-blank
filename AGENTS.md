@@ -395,6 +395,133 @@ Before marking a feature complete, check the items that apply:
 - [ ] The feature has been tested with slow connections and realistic failure cases.
 
 
+
+
+## Design Psychology, Visual Systems, and AI-Assisted Design
+
+Use this section when designing, reviewing, or prompting an interface, landing page, product flow, design system, or AI-generated visual. These principles are decision aids, not universal laws or substitutes for usability testing. Apply only what helps the actual audience and task. Several principles below are expanded elsewhere in this document; this section is the compact reference index.
+
+### 1. Design psychology reference
+
+| Principle | Practical meaning for product design |
+|---|---|
+| **Aesthetic-usability effect** | People often perceive carefully crafted interfaces as easier to use and may forgive small flaws. Visual polish never excuses broken behavior, poor accessibility, or confusing interaction. |
+| **Law of proximity** | Elements placed near one another are perceived as a group. Use spacing to communicate relationships and separate unrelated content. |
+| **Von Restorff effect** | A visually distinct item among similar items attracts attention and is more memorable. Reserve strong distinction for genuinely important information or actions. |
+| **Zeigarnik effect** | Incomplete tasks can remain more mentally salient than completed ones. Use this to make legitimate unfinished work and next steps clear; never manufacture anxiety, artificial incompleteness, or compulsive return loops. |
+| **Tesler's law** | Some task complexity is inherent and can be shifted between the system and the user. Automate safe, predictable work while keeping important choices understandable and controllable. See the existing Tesler's Law guidance above. |
+| **Law of Prägnanz** | People tend to interpret complex visuals in the simplest coherent form. Prefer clear shapes, hierarchy, and compositions over unnecessary visual complexity. |
+| **Serial position effect** | People tend to remember the first and last items in a sequence better. Put essential context at the beginning and useful conclusions or next steps at the end; do not hide critical information in the middle. |
+| **Progressive disclosure** | Show essential information and actions first; reveal advanced options when they become relevant. Do not bury important capabilities. See the existing Progressive Disclosure guidance above. |
+| **Law of common region** | Elements within the same container, surface, or background are perceived as related. Use containers only when they communicate a real grouping. |
+| **Goal-gradient effect** | Motivation can increase as someone approaches a goal. Show truthful progress toward a goal the user chose; never invent progress or use it to pressure users into unnecessary activity. |
+| **Law of similarity** | Elements that share visual properties are perceived as related and often expected to behave alike. Keep controls with the same role visually and behaviorally consistent. |
+| **Recognition over recall** | Visible choices and contextual cues are easier than requiring users to remember information. Prefer discoverable options, meaningful labels, recent context, and sensible suggestions over memory tests. |
+| **Pareto principle** | A relatively small subset of features may account for a large share of usage (often expressed as an approximate 80/20 relationship). Use actual analytics and research to prioritize; do not treat the ratio as guaranteed. |
+| **Occam's razor** | When alternatives meet the same requirements, prefer the one with fewer unnecessary parts. Do not simplify away necessary safety, accessibility, resilience, or user control. |
+| **Parkinson's law** | Work can expand to fill the time available. Remove avoidable steps and make routine tasks efficient, without rushing users through consequential decisions. |
+| **Uniform connectedness** | Items joined by a line, frame, shared treatment, or other clear connection are perceived as more related. Use connectors when they clarify sequence, ownership, or relationships. |
+| **Paradox of the active user** | People commonly begin using a product before reading documentation. Teach through contextual hints, examples, and feedback at the point of action; keep deeper documentation available. |
+| **Cognitive load** | Every screen consumes mental effort. Remove irrelevant choices and decoration, use familiar language, chunk complex tasks, and preserve the information needed to make a good decision. |
+| **Default effect** | People often retain the preselected option. Choose defaults that are safe, useful, transparent, and appropriate for the broadest legitimate case; clearly disclose consequential defaults and make them easy to change. |
+| **Peak-end rule** | People may judge an experience disproportionately by its most salient moment and its ending. Make important interactions and completion states genuinely good, but do not use a polished ending to conceal a poor overall experience. |
+
+Use these principles together rather than applying them mechanically. For every proposed technique, identify the user need it serves, the behavior it should improve, and how that behavior will be checked.
+
+### 2. Additional product psychology techniques
+
+- **Mental simulation:** Help people picture themselves completing a real task in a believable context. Use relevant scenarios, product screenshots, and consistent visual storytelling rather than generic lifestyle decoration.
+- **Authority and social proof:** Genuine independent recognition, credible evidence, and verified customer outcomes can build trust. Never invent awards, endorsements, user counts, testimonials, rankings, or credentials.
+- **Goal-gradient:** Show a clear path and truthful progress through multi-step tasks. Progress indicators must reflect actual work and must not pressure users to continue when stopping is reasonable.
+- **Identity and audience language:** Use the vocabulary and mental models of the intended audience where research supports them. Do not fabricate community language or pretend the product has an identity or endorsement it does not have.
+- **Aesthetic-usability:** Visual care can improve perceived quality and confidence. Pair it with correct behavior, accessibility, performance, and clear feedback.
+
+Psychology is for reducing friction and supporting user agency, not exploiting attention, uncertainty, loss aversion, or social pressure. The existing dark-pattern restrictions in this document take priority whenever an engagement technique could become manipulative.
+
+### 3. Colour systems and visual hierarchy
+
+- Treat the **60/30/10 rule** as a starting point: approximately 60% dominant/base colour, 30% supporting colour, and 10% accent. It is a compositional heuristic, not a mandatory formula or a reason to force three colours into every interface.
+- Derive an accent colour from the product's own identity, imagery, content, or environment when that creates a more coherent and recognisable system. Do not add an unrelated accent merely because a palette trend is popular.
+- Define semantic colour roles (such as surface, text, border, action, success, warning, and danger) and map the palette to those roles consistently.
+- Verify contrast, state differentiation, and readability. Never communicate meaning through colour alone.
+- Keep dominant, supporting, and accent roles stable across pages and states. An accent should draw attention to a small number of meaningful actions or details, not compete with the whole interface.
+- Keep lighting, shadow temperature, gradients, texture, image treatment, and depth consistent. Visual details should reinforce one visual world rather than look assembled from unrelated component demos.
+
+### 4. Avoiding design slop and trend stacking
+
+A modern design treatment is not automatically poor design. A collection of individually acceptable effects can become incoherent when they are all used together.
+
+- Do not stack fashionable gradients, glass panels, glows, blur, grain, floating cards, oversized typography, scroll effects, 3D objects, and ornamental animation without a clear hierarchy.
+- Choose a small number of visual ideas that support the product's identity and content.
+- Give every effect a purpose: communicate state, hierarchy, affordance, feedback, depth, or meaningful storytelling.
+- Remove effects that compete with content, reduce legibility, obscure controls, slow the interface, or make the product resemble a generic template.
+- Review the interface as a whole, not only as isolated components. Check whether its combined treatments feel coherent.
+- Vintage, retro, poster, and print-design references can inform composition, typography, colour, texture, and art direction. Use them as inspiration only when they fit the product; do not apply a nostalgic skin without a product reason.
+
+### 5. AI-assisted visual and motion workflows
+
+AI tools can accelerate exploration and asset creation, but generated output is a draft that still requires design direction and engineering review.
+
+A useful workflow for frame-based motion is:
+
+1. Define the subject, art direction, composition, palette, lighting, camera, and intended motion.
+2. Generate a small set of consistent visual frames with an image-generation tool (for example, a GPT Image model).
+3. Animate or interpolate the frames with a video-generation tool (for example, Seedance).
+4. Review temporal consistency, object identity, typography, artifacts, transitions, and whether the motion actually serves the interface.
+5. Integrate only the approved output, with appropriate asset optimisation, accessibility alternatives, and reduced-motion behavior.
+
+Creative tools and integrations mentioned as examples in this research include Higgsfield and its Claude MCP integration. Treat tool names and model versions as examples, not fixed dependencies; verify current availability, licensing, terms, security, and compatibility before adopting them. An MCP integration is an orchestration interface, not proof that generated output is correct or safe.
+
+When using Claude or another coding agent for design work, turn the objective into a scoped, reusable task:
+
+- **Laws pass:** review the interface against the 20 design-psychology principles above.
+- **Accent pass:** inspect the existing brand, imagery, and product content to propose a restrained, coherent accent system.
+- **Style exploration pass:** generate a few meaningfully different art directions, compare them against product requirements, then select and refine one instead of combining every style.
+- **Implementation pass:** translate the chosen direction into reusable tokens and components; preserve the existing architecture and working product behavior.
+- **Critique pass:** inspect the complete experience for trend stacking, inconsistencies, accessibility problems, inert interactions, and missing states.
+
+These are workflow descriptions, not assumptions that matching skill files or prompts already exist in the repository. Do not claim to have installed or invoked a skill unless its files and execution are verified.
+
+### 6. Interactive graphics and visual-engineering references
+
+The following libraries and techniques are examples for evaluating a design requirement, not mandatory project dependencies:
+
+| Reference | Intended use described in the research | Engineering considerations |
+|---|---|---|
+| **Liquid Logo** | Liquid-chrome logo treatments for a hero or introduction. | Preserve logo legibility and brand recognition; avoid lengthy or blocking intro animations. |
+| **three-geospatial** | Real-world 3D map scenes with volumetric cloud effects. | Consider data accuracy, geographic context, rendering cost, and mobile performance. |
+| **vgpu** | WebGPU-based graphics workflows, including agent-directed visual experiments. | Verify the actual library, browser support, API maturity, fallback strategy, and maintenance before adoption. |
+| **WebGL Fluid Simulation** | Interactive fluid effects that react to pointer movement. | Keep the effect subordinate to content; control GPU cost, touch behavior, and reduced-motion alternatives. |
+| **React Three Fiber** | Declarative React renderer for Three.js and interactive 3D experiences. | Use only in React-based projects where 3D adds real value; manage scene lifecycle, loading, accessibility, and performance. |
+
+Also consider WebGL, WebGPU, Three.js, and shader-based effects when a requirement genuinely calls for real-time graphics. Do not introduce a rendering engine solely to make a page look more elaborate.
+
+Before adopting any library:
+- Inspect its official repository, documentation, license, maintenance activity, dependencies, and compatibility with the current stack.
+- Confirm whether the effect can be achieved with existing CSS, SVG, canvas, or project dependencies first.
+- Load expensive graphics lazily and provide a meaningful static or lightweight fallback.
+- Respect reduced-motion preferences, keyboard and touch interaction, mobile GPUs, battery usage, and low-power devices.
+- Avoid rendering effects that obstruct reading, focus, navigation, or the primary action.
+- Measure performance on realistic devices; do not infer performance from a desktop development machine.
+
+### 7. Design-review completion checklist
+
+Before accepting a substantial visual or AI-assisted UI change, check the items that apply:
+
+- [ ] The chosen principles solve a stated user or product problem.
+- [ ] Visual hierarchy and grouping are clear without relying on decoration.
+- [ ] Colour roles are coherent, restrained, and accessible; any 60/30/10 use is treated as a heuristic.
+- [ ] The accent colour belongs to the product's visual identity.
+- [ ] Similar controls behave similarly; distinct treatment is reserved for meaningful differences.
+- [ ] Advanced complexity is disclosed progressively without hiding important capabilities.
+- [ ] Progress, defaults, claims, awards, and social proof are truthful.
+- [ ] No engagement technique creates artificial urgency, incomplete loops, shame, or unnecessary return visits.
+- [ ] Motion is purposeful, temporally consistent, and respects reduced-motion preferences.
+- [ ] AI-generated images and animations have been inspected and approved rather than accepted blindly.
+- [ ] Any graphics library is justified by the requirement and checked for license, support, compatibility, and performance.
+- [ ] Mobile, keyboard, accessibility, loading, empty, error, and fallback states remain usable.
+- [ ] The combined page feels like one deliberate design system rather than a stack of unrelated trends.
+
 ---
 
 ## Structural Untangling Protocol — Untangle Codebase
