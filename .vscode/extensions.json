@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "asvetliakov.vscode-neovim",
     "editorconfig.editorconfig",
     "streetsidesoftware.code-spell-checker",
     "davidanson.vscode-markdownlint",
